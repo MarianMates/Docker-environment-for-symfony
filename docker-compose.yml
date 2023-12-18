@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  php:
+    build:
+      dockerfile: docker/php/dockerfile
+    volumes:
+      - ./:/var/www/symfony
+      - ./docker/php/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    environment:
+      - PHP_IDE_CONFIG=serverName=symfony.local
+    container_name: symfony_php
+    networks:
+      - symfony
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www/symfony
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    container_name: symfony_nginx
+    networks:
+      - symfony
+    depends_on:
+      - php
+
+  mysql:
+    image: mysql:8
+    ports:
+      - "3306:3306"
+    volumes:
+      - ../databases/SymfonyWithDocker:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: symfony
+      MYSQL_USER: symfony
+      MYSQL_PASSWORD: symfony
+    container_name: symfony_mysql
+    networks:
+      - symfony
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    container_name: symfony_redis
+    networks:
+      - symfony
+
+networks:
+  symfony:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
