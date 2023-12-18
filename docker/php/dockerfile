@@ -32,5 +32,5 @@ RUN chown -R www-data:www-data /var/www
 USER www-data
 
 # Configure git
-RUN git config --global user.email "marian.mates@evozon.com" \
-    && git config --global user.name "Marian Mates"
+RUN git config --global user.email "your.email@whatever.com" \
+    && git config --global user.name "Your Name"
